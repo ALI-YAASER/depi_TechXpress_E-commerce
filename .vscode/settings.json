@@ -1,0 +1,21 @@
+{
+  "dotnet.defaultSolution": "backend.slnx",
+
+  // استبعاد وإخفاء الملفات والمجلدات من الـ Explorer
+  "files.exclude": {
+    "**/.git": true,
+    "**/.vs": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/.idea": true,
+    "**/*.user": true,
+    "**/*.suo": true
+  },
+
+  // استبعادها من البحث داخل المشروع (Ctrl + Shift + F)
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/.vs": true
+  }
+}
