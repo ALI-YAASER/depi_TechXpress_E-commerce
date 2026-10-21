@@ -1,0 +1,106 @@
+## =====================================
+## إعدادات البناء والمخرجات (Build & Outputs)
+## =====================================
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+publish/
+[Aa]pp_Data/[Tt]emp/
+TestResults/
+[Tt]est[Rr]esult*/
+coverage/
+*.coverage
+*.coveragexml
+
+# ملفات الرموز البرمجية والمخرجات المؤقتة
+*.pdb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.dll.config
+*.cache
+
+## =====================================
+## أدوات التطوير (Visual Studio, VS Code, Rider)
+## =====================================
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.ide/
+*.suo
+*.userprefs
+*.launchsettings.json.user
+.idea/
+_ReSharper*/
+*.ReSharper
+
+## =====================================
+## إدارة الحزم والاعتماديات (Dependencies)
+## =====================================
+# NuGet Packages
+*.nupkg
+packages/
+!**/packages/build/
+project.lock.json
+project.assets.json
+
+# حزم الواجهة الأمامية (Node / NPM / Vite / Yarn)
+node_modules/
+bower_components/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+dist/
+dist-ssr/
+*.local
+
+# مكتبات wwwroot المؤقتة (LibMan cache)
+wwwroot/lib/*
+
+## =====================================
+## ملفات الإعدادات الحساسة (Secrets & Environment)
+## =====================================
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+*.local.json
+.env
+.env.*
+!.env.example
+
+## =====================================
+## قواعد البيانات والملفات المؤقتة (Databases)
+## =====================================
+*.mdf
+*.ldf
+*.ndf
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+## =====================================
+## ملفات نظام التشغيل (OS Generated)
+## =====================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
