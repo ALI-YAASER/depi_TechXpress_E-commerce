@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
 
 namespace backend.Data;
 
-public partial class TechXpressDbContext : DbContext
+public partial class TechXpressDbContext : IdentityDbContext<ApplicationUser>
 {
     public TechXpressDbContext(DbContextOptions<TechXpressDbContext> options)
         : base(options)
@@ -38,6 +39,8 @@ public partial class TechXpressDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Address>(entity =>
         {
             entity.HasIndex(e => e.UserId, "IX_Addresses_UserId");

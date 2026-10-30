@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using backend.Data;
@@ -21,10 +21,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<TechXpressDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// ---- Identity (جداول المستخدمين على AuthDbContext المنفصل) ----
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
+// ---- Identity (إدارة المستخدمين والأدوار على TechXpressDbContext الموحّد) ----
 builder.Services.AddIdentityCore<ApplicationUser>(o =>
 {
     o.Password.RequiredLength = 8;
@@ -35,7 +32,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(o =>
     o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
 })
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AuthDbContext>();
+    .AddEntityFrameworkStores<TechXpressDbContext>();
 
 builder.Services.AddScoped<AuthService>();
 

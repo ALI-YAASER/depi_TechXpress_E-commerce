@@ -1,6 +1,378 @@
 @backend_HostAddress = http://localhost:5132
+@adminToken = your_admin_jwt_token_here
+@customerToken = your_customer_jwt_token_here
 
-GET {{backend_HostAddress}}/weatherforecast/
+### 1. Health Check
+GET {{backend_HostAddress}}/api/health
 Accept: application/json
 
-###
+### =========================================================================
+### 2. Authentication
+### =========================================================================
+
+### Admin Login
+# @name adminLogin
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@techxpress.com",
+  "password": "Admin12345!"
+}
+
+### Register New Customer
+POST {{backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "customer1@techxpress.com",
+  "password": "Customer12345!",
+  "fullName": "John Doe"
+}
+
+### Customer Login
+# @name customerLogin
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer1@techxpress.com",
+  "password": "Customer12345!"
+}
+
+### Get Current User Profile (Me)
+GET {{backend_HostAddress}}/api/auth/me
+Authorization: Bearer {{customerToken}}
+
+### =========================================================================
+### 3. Categories (Admin & Public)
+### =========================================================================
+
+### Get All Active Categories
+GET {{backend_HostAddress}}/api/categories
+Accept: application/json
+
+### Get All Categories (Including Inactive - Admin)
+GET {{backend_HostAddress}}/api/categories?includeInactive=true
+Authorization: Bearer {{adminToken}}
+
+### Create Category (Admin)
+POST {{backend_HostAddress}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Laptops & Notebooks",
+  "slug": "laptops-and-notebooks",
+  "isActive": true
+}
+
+### Get Category By ID
+GET {{backend_HostAddress}}/api/categories/1
+
+### Update Category (Admin)
+PUT {{backend_HostAddress}}/api/categories/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Laptops",
+  "slug": "laptops",
+  "isActive": true
+}
+
+### Delete Category (Admin)
+DELETE {{backend_HostAddress}}/api/categories/1
+Authorization: Bearer {{adminToken}}
+
+### =========================================================================
+### 4. Brands (Admin & Public)
+### =========================================================================
+
+### Get All Active Brands
+GET {{backend_HostAddress}}/api/brands
+
+### Create Brand (Admin)
+POST {{backend_HostAddress}}/api/brands
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Dell",
+  "logoUrl": "https://example.com/dell-logo.png",
+  "isActive": true
+}
+
+### Get Brand By ID
+GET {{backend_HostAddress}}/api/brands/1
+
+### Update Brand (Admin)
+PUT {{backend_HostAddress}}/api/brands/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Dell Technologies",
+  "logoUrl": "https://example.com/dell-logo.png",
+  "isActive": true
+}
+
+### Delete Brand (Admin)
+DELETE {{backend_HostAddress}}/api/brands/1
+Authorization: Bearer {{adminToken}}
+
+### =========================================================================
+### 5. Products (Admin & Public)
+### =========================================================================
+
+### Get Products List (Search, Filter, Sort, Pagination)
+GET {{backend_HostAddress}}/api/products?search=Dell&minPrice=1000&maxPrice=50000&sortBy=price&sortDir=asc&page=1&pageSize=12
+
+### Get Product Details by ID
+GET {{backend_HostAddress}}/api/products/1
+
+### Get Product Details by Slug
+GET {{backend_HostAddress}}/api/products/slug/dell-xps-15
+
+### Create Product (Admin)
+POST {{backend_HostAddress}}/api/products
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Dell XPS 15",
+  "slug": "dell-xps-15",
+  "sku": "DELL-XPS15-001",
+  "description": "High performance laptop with OLED display",
+  "price": 45000.00,
+  "discountPrice": 42000.00,
+  "stockQuantity": 10,
+  "categoryId": 1,
+  "brandId": 1,
+  "isActive": true,
+  "specifications": [
+    { "name": "RAM", "value": "16 GB" },
+    { "name": "Processor", "value": "Intel Core i7" },
+    { "name": "Storage", "value": "1 TB SSD" }
+  ],
+  "images": [
+    { "imageUrl": "https://example.com/xps15-front.jpg", "isPrimary": true, "sortOrder": 0 }
+  ]
+}
+
+### Update Product (Admin)
+PUT {{backend_HostAddress}}/api/products/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Dell XPS 15 (Updated)",
+  "sku": "DELL-XPS15-001",
+  "price": 45000.00,
+  "discountPrice": 39999.00,
+  "stockQuantity": 15,
+  "categoryId": 1,
+  "brandId": 1,
+  "isActive": true
+}
+
+### Add Product Image (Admin)
+POST {{backend_HostAddress}}/api/products/1/images
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "imageUrl": "https://example.com/xps15-back.jpg",
+  "isPrimary": false,
+  "sortOrder": 1
+}
+
+### Delete Product Image (Admin)
+DELETE {{backend_HostAddress}}/api/products/1/images/1
+Authorization: Bearer {{adminToken}}
+
+### Delete / Deactivate Product (Admin)
+DELETE {{backend_HostAddress}}/api/products/1
+Authorization: Bearer {{adminToken}}
+
+### =========================================================================
+### 6. Cart (Customer)
+### =========================================================================
+
+### Get Customer Cart
+GET {{backend_HostAddress}}/api/cart
+Authorization: Bearer {{customerToken}}
+
+### Add Item to Cart
+POST {{backend_HostAddress}}/api/cart/items
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+### Update Cart Item Quantity
+PUT {{backend_HostAddress}}/api/cart/items/1
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### Remove Item from Cart
+DELETE {{backend_HostAddress}}/api/cart/items/1
+Authorization: Bearer {{customerToken}}
+
+### Clear Cart
+DELETE {{backend_HostAddress}}/api/cart
+Authorization: Bearer {{customerToken}}
+
+### =========================================================================
+### 7. Addresses (Customer)
+### =========================================================================
+
+### Get Customer Addresses
+GET {{backend_HostAddress}}/api/addresses
+Authorization: Bearer {{customerToken}}
+
+### Add Customer Address
+POST {{backend_HostAddress}}/api/addresses
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "recipientName": "John Doe",
+  "phoneNumber": "01012345678",
+  "city": "Cairo",
+  "street": "90th Street",
+  "buildingNumber": "12A",
+  "additionalDetails": "Floor 3, Apt 301",
+  "isDefault": true
+}
+
+### Update Customer Address
+PUT {{backend_HostAddress}}/api/addresses/1
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "recipientName": "John Doe",
+  "phoneNumber": "01098765432",
+  "city": "Cairo",
+  "street": "90th Street North",
+  "buildingNumber": "12B",
+  "additionalDetails": "Floor 4, Apt 401",
+  "isDefault": true
+}
+
+### Delete Customer Address
+DELETE {{backend_HostAddress}}/api/addresses/1
+Authorization: Bearer {{customerToken}}
+
+### =========================================================================
+### 8. Orders (Customer)
+### =========================================================================
+
+### Create Order from Cart (CashOnDelivery)
+POST {{backend_HostAddress}}/api/orders
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "addressId": 1,
+  "paymentMethod": "CashOnDelivery"
+}
+
+### Get My Orders
+GET {{backend_HostAddress}}/api/orders/my?page=1&pageSize=10
+Authorization: Bearer {{customerToken}}
+
+### Get My Order Details by ID
+GET {{backend_HostAddress}}/api/orders/1
+Authorization: Bearer {{customerToken}}
+
+### Cancel My Order
+POST {{backend_HostAddress}}/api/orders/1/cancel
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "note": "Changed my mind"
+}
+
+### =========================================================================
+### 9. Admin Dashboard & Operations (Admin)
+### =========================================================================
+
+### Get Dashboard Statistics
+GET {{backend_HostAddress}}/api/admin/dashboard/stats
+Authorization: Bearer {{adminToken}}
+
+### Get Sales Over Time (by Day)
+GET {{backend_HostAddress}}/api/admin/dashboard/sales?groupBy=day
+Authorization: Bearer {{adminToken}}
+
+### Get Sales Over Time (by Month)
+GET {{backend_HostAddress}}/api/admin/dashboard/sales?groupBy=month
+Authorization: Bearer {{adminToken}}
+
+### Get Best Sellers
+GET {{backend_HostAddress}}/api/admin/dashboard/best-sellers?take=5
+Authorization: Bearer {{adminToken}}
+
+### Get Low Stock Products
+GET {{backend_HostAddress}}/api/admin/dashboard/low-stock?take=10
+Authorization: Bearer {{adminToken}}
+
+### Get Inventory List
+GET {{backend_HostAddress}}/api/admin/inventory?page=1&pageSize=20&lowStockOnly=false
+Authorization: Bearer {{adminToken}}
+
+### Update Product Stock by Quantity
+PATCH {{backend_HostAddress}}/api/admin/inventory/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "stockQuantity": 25
+}
+
+### Update Product Stock by Delta (+ or -)
+PATCH {{backend_HostAddress}}/api/admin/inventory/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "delta": -2
+}
+
+### List All Orders (Admin)
+GET {{backend_HostAddress}}/api/admin/orders?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Get Order Details for Admin (Includes Customer info)
+GET {{backend_HostAddress}}/api/admin/orders/1
+Authorization: Bearer {{adminToken}}
+
+### Change Order Status (Admin: Shipped)
+PATCH {{backend_HostAddress}}/api/admin/orders/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "Shipped",
+  "note": "Order handed over to courier"
+}
+
+### Change Order Status (Admin: Delivered -> Marks COD as Paid)
+PATCH {{backend_HostAddress}}/api/admin/orders/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "Delivered",
+  "note": "Order successfully delivered to customer"
+}

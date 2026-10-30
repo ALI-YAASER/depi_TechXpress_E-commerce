@@ -1,4 +1,4 @@
-﻿using backend.Helpers;
+using backend.Helpers;
 using backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +11,10 @@ public static class IdentitySeeder
 {
     public static async Task SeedAsync(IServiceProvider sp)
     {
-        var db = sp.GetRequiredService<AuthDbContext>();
+        var db = sp.GetRequiredService<TechXpressDbContext>();
         var logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("IdentitySeeder");
         var config = sp.GetRequiredService<IConfiguration>();
 
-        // بيطبّق migrations جداول Identity بس.
         await db.Database.MigrateAsync();
 
         var roles = sp.GetRequiredService<RoleManager<IdentityRole>>();

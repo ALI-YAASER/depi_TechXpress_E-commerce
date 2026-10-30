@@ -16,13 +16,11 @@ public record OrderResult(OrderDetailDto? Order, int StatusCode, string? Error)
 public class OrderService
 {
     private readonly TechXpressDbContext _db;
-    private readonly AuthDbContext _auth;
     private readonly IConfiguration _config;
 
-    public OrderService(TechXpressDbContext db, AuthDbContext auth, IConfiguration config)
+    public OrderService(TechXpressDbContext db, IConfiguration config)
     {
         _db = db;
-        _auth = auth;
         _config = config;
     }
 
@@ -159,7 +157,7 @@ public class OrderService
         if (dto is null) return null;
 
         var uid = await _db.Orders.AsNoTracking().Where(o => o.Id == id).Select(o => o.UserId).FirstAsync();
-        var user = await _auth.Users.AsNoTracking().Where(u => u.Id == uid)
+        var user = await _db.Users.AsNoTracking().Where(u => u.Id == uid)
             .Select(u => new { u.FullName, u.Email }).FirstOrDefaultAsync();
         return user is null ? dto : dto with { CustomerName = user.FullName, CustomerEmail = user.Email };
     }
@@ -185,8 +183,7 @@ public class OrderService
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
             var s = query.Search.Trim();
-            // بيانات العملاء في AuthDbContext (context تاني)، فنجيب الـ ids الأول.
-            var userIds = await _auth.Users.AsNoTracking()
+            var userIds = await _db.Users.AsNoTracking()
                 .Where(u => u.Email!.Contains(s) || u.FullName.Contains(s))
                 .Select(u => u.Id).Take(200).ToListAsync();
             q = q.Where(o => o.OrderNumber.Contains(s) || userIds.Contains(o.UserId));
@@ -310,7 +307,7 @@ public class OrderService
         if (includeCustomer && rows.Count > 0)
         {
             var ids = rows.Select(r => r.UserId).Distinct().ToList();
-            users = await _auth.Users.AsNoTracking().Where(u => ids.Contains(u.Id))
+            users = await _db.Users.AsNoTracking().Where(u => ids.Contains(u.Id))
                 .ToDictionaryAsync(u => u.Id, u => (u.FullName, u.Email));
         }
 

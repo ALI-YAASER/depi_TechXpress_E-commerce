@@ -8,13 +8,11 @@ namespace backend.Services;
 public class DashboardService
 {
     private readonly TechXpressDbContext _db;
-    private readonly AuthDbContext _auth;
     private readonly IConfiguration _config;
 
-    public DashboardService(TechXpressDbContext db, AuthDbContext auth, IConfiguration config)
+    public DashboardService(TechXpressDbContext db, IConfiguration config)
     {
         _db = db;
-        _auth = auth;
         _config = config;
     }
 
@@ -54,11 +52,11 @@ public class DashboardService
         var lowStock = await activeProducts.CountAsync(p => p.StockQuantity <= threshold);
         var outOfStock = await activeProducts.CountAsync(p => p.StockQuantity == 0);
 
-        var customerRoleId = await _auth.Roles.AsNoTracking()
+        var customerRoleId = await _db.Roles.AsNoTracking()
             .Where(r => r.Name == Roles.Customer).Select(r => r.Id).FirstOrDefaultAsync();
         var customers = customerRoleId is null
             ? 0
-            : await _auth.UserRoles.AsNoTracking().CountAsync(ur => ur.RoleId == customerRoleId);
+            : await _db.UserRoles.AsNoTracking().CountAsync(ur => ur.RoleId == customerRoleId);
 
         // كل الحالات تظهر حتى لو عددها صفر (علشان الرسم البياني).
         var byStatus = OrderStatuses.All
@@ -124,7 +122,7 @@ public class DashboardService
             .Take(take)
             .ToListAsync();
 
-        return rows.Select(r => new BestSellerDto(r.ProductId!.Value, r.Name, r.Units, r.Revenue)).ToList();
+        return rows.Select(r => new BestSellerDto(r.ProductId!.Value, r.Name ?? string.Empty, r.Units, r.Revenue)).ToList();
     }
 
     public async Task<List<LowStockProductDto>> GetLowStockAsync(int take)
