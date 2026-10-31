@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { X, Heart, ShoppingBag, Trash2, ArrowRight } from "lucide-react";
 import { useShop } from "../../context/ShopContext";
@@ -14,7 +15,26 @@ export default function WishlistDrawer() {
     sendDirectWhatsApp
   } = useShop();
 
-  if (!isWishlistOpen) return null;
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (isWishlistOpen) {
+      setMounted(true);
+      const timer = setTimeout(() => {
+        setVisible(true);
+      }, 25);
+      return () => clearTimeout(timer);
+    } else {
+      setVisible(false);
+      const timer = setTimeout(() => {
+        setMounted(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isWishlistOpen]);
+
+  if (!mounted) return null;
 
   const favoriteProducts = products.filter((p) => wishlist.includes(p.id));
 
@@ -28,12 +48,18 @@ export default function WishlistDrawer() {
     <div className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-500 ease-out ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
         onClick={() => setIsWishlistOpen(false)}
       />
 
       {/* Drawer Panel */}
-      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+      <aside
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-out transform ${
+          visible ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50/70">
           <div className="flex items-center gap-2 font-extrabold text-base sm:text-lg text-slate-900">
